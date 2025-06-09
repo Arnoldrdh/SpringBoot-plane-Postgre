@@ -2,9 +2,6 @@ package com.ticketplane.data.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.ticketplane.data.dto.UserSummaryDTO;
 import com.ticketplane.data.model.ModelUser;
@@ -16,7 +13,7 @@ public class ServiceUser {
     private RepositoryUser rpUser;
 
     // register user
-    public boolean userRegister(@RequestBody ModelUser user) {
+    public boolean userRegister(ModelUser user) {
         if (rpUser.existsByEmail(user.getEmail()) || rpUser.existsByUsername(user.getUsername())) {
             return false;
         }
@@ -26,13 +23,13 @@ public class ServiceUser {
     }
 
     // login user
-    public boolean userLogin(@RequestBody ModelUser user) {
+    public boolean userLogin(ModelUser user) {
         ModelUser userData = rpUser.findByEmailAndPassword(user.getEmail(), user.getPassword());
         return userData != null;
     }
 
     // profile user
-    public UserSummaryDTO userProfile(@PathVariable Integer userId) {
+    public UserSummaryDTO userProfile(Integer userId) {
         ModelUser userProfile = rpUser.findById(userId).orElse(null);
         if (rpUser.existsById(userId)) {
             UserSummaryDTO dto = new UserSummaryDTO();
@@ -45,7 +42,7 @@ public class ServiceUser {
     }
 
     // update profile user
-    public boolean updateProfileUser(@PathVariable Integer userId, @RequestBody ModelUser userData) {
+    public boolean updateProfileUser(Integer userId, ModelUser userData) {
         if (rpUser.existsById(userId)) {
             @SuppressWarnings("Null")
             ModelUser user = rpUser.findById(userId).get();
@@ -65,7 +62,7 @@ public class ServiceUser {
     }
 
     // deleteuser
-    public boolean deleteUser(@PathVariable Integer userId) {
+    public boolean deleteUser(Integer userId) {
         if (rpUser.existsById(userId)) {
             rpUser.deleteById(userId);
             return true;
