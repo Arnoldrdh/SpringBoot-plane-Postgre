@@ -55,6 +55,8 @@ public class ServiceBooking {
         bookingData.setSeatNumber(reqBooking.getSeatNumber());
 
         ModelBooking savedBooking = rpBooking.save(bookingData);
+        flightData.setAvailableSeats(flightData.getAvailableSeats() - 1);
+        rpFlight.save(flightData);
 
         // response bagian flight dto
         BookingResponseDTO response = new BookingResponseDTO();
@@ -89,6 +91,13 @@ public class ServiceBooking {
         ModelBooking booking = rpBooking.findById(bookingId).orElse(null);
         if (booking == null) {
             return false;
+        }
+
+        // Kembalikan kursi ke ModelFlight
+        ModelFlight flight = booking.getFlight();
+        if (flight != null) {
+            flight.setAvailableSeats(flight.getAvailableSeats() + 1);
+            rpFlight.save(flight);
         }
 
         booking.setStatus("Canceled");
