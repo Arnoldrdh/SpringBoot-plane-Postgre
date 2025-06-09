@@ -4,6 +4,7 @@ public class RequestBooking {
     public String seatNumber;
     public Integer FlightId;
     public Integer UserId;
+    public String phoneNumber;
 
     public String getSeatNumber() {
         return this.seatNumber;
