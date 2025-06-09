@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketplane.data.model.ModelFlight;
-import com.ticketplane.data.repository.RepositoryFlight;
 import com.ticketplane.data.service.ServiceFlight;
 
 @RestController
@@ -18,9 +17,6 @@ import com.ticketplane.data.service.ServiceFlight;
 public class ControllerFlight {
     @Autowired
     private ServiceFlight srFlight;
-
-    @Autowired
-    private RepositoryFlight rpFlight;
 
     // add penerbangan
     @PostMapping("/add")
