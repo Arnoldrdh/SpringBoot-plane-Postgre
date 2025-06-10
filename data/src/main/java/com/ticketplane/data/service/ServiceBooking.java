@@ -94,6 +94,13 @@ public class ServiceBooking {
             return false;
         }
 
+        // Kembalikan kursi ke ModelFlight
+        ModelFlight flight = booking.getFlight();
+        if (flight != null) {
+            flight.setAvailableSeats(flight.getAvailableSeats() + 1);
+            rpFlight.save(flight);
+        }
+
         booking.setStatus("Canceled");
         rpBooking.save(booking);
         return true;
