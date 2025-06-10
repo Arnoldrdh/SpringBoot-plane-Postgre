@@ -1,6 +1,7 @@
 package com.ticketplane.data.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,8 @@ public class ServiceBooking {
         bookingData.setSeatNumber(reqBooking.getSeatNumber());
 
         ModelBooking savedBooking = rpBooking.save(bookingData);
+        flightData.setAvailableSeats(flightData.getAvailableSeats() - 1);
+        rpFlight.save(flightData);
 
         // response bagian flight dto
         BookingResponseDTO response = new BookingResponseDTO();
@@ -97,13 +100,78 @@ public class ServiceBooking {
     }
 
     // detail tiket
-    public ModelBooking detailBooking(Integer bookingId) {
-        return rpBooking.findById(bookingId).orElse(null);
+    public BookingResponseDTO detailBooking(Integer bookingId) {
+        ModelBooking booking = rpBooking.findById(bookingId).orElse(null);
+        if (booking == null)
+            return null;
+
+        BookingResponseDTO dto = new BookingResponseDTO();
+        dto.setBookingId(booking.getBookingId());
+        dto.setSeatNumber(booking.getSeatNumber());
+        dto.setStatus(booking.getStatus());
+        dto.setBookingTime(booking.getBookingTime().toString());
+        dto.setPaymentStatus(booking.getPaymentStatus());
+        dto.setPrice(booking.getFlight().getPrice());
+
+        FlightSummaryDTO flightDTO = new FlightSummaryDTO();
+        flightDTO.setFlightNumber(booking.getFlight().getFlightNumber());
+        flightDTO.setDeparture(booking.getFlight().getDeparture());
+        flightDTO.setDestination(booking.getFlight().getDestination());
+        flightDTO.setDepartureTime(booking.getFlight().getDepartureTime().toString());
+        flightDTO.setArrivalTime(booking.getFlight().getArrivalTime().toString());
+        dto.setFlight(flightDTO);
+
+        // Map user
+        UserSummaryDTO userDTO = new UserSummaryDTO();
+        userDTO.setUsername(booking.getUser().getUsername());
+        userDTO.setEmail(booking.getUser().getEmail());
+        userDTO.setPhoneNumber(booking.getUser().getPhoneNumber());
+        dto.setUser(userDTO);
+
+        return dto;
     }
 
     // history pemesanan tiket
-    public List<ModelBooking> historyBookingUser(Integer userId) {
-        return rpBooking.findByUserUserId(userId);
+    public List<BookingResponseDTO> historyBookingUser(Integer userId) {
+        List<ModelBooking> bookings = rpBooking.findByUserUserId(userId);
+        List<BookingResponseDTO> responseList = new ArrayList<>();
+
+        for (ModelBooking booking : bookings) {
+            BookingResponseDTO dto = new BookingResponseDTO();
+            dto.setBookingId(booking.getBookingId());
+            dto.setSeatNumber(booking.getSeatNumber());
+            dto.setStatus(booking.getStatus());
+            dto.setBookingTime(booking.getBookingTime());
+            dto.setPaymentStatus(booking.getPaymentStatus());
+
+            // Flight
+            ModelFlight flight = booking.getFlight();
+            if (flight != null) {
+                FlightSummaryDTO flightDTO = new FlightSummaryDTO();
+                flightDTO.setFlightNumber(flight.getFlightNumber());
+                flightDTO.setDeparture(flight.getDeparture());
+                flightDTO.setDestination(flight.getDestination());
+                flightDTO.setDepartureTime(flight.getDepartureTime());
+                flightDTO.setArrivalTime(flight.getArrivalTime());
+                dto.setFlight(flightDTO);
+
+                dto.setPrice(flight.getPrice()); // Set harga dari flight
+            }
+
+            // User
+            ModelUser user = booking.getUser();
+            if (user != null) {
+                UserSummaryDTO userDTO = new UserSummaryDTO();
+                userDTO.setUsername(user.getUsername());
+                userDTO.setEmail(user.getEmail());
+                userDTO.setPhoneNumber(user.getPhoneNumber());
+                dto.setUser(userDTO);
+            }
+
+            responseList.add(dto);
+        }
+
+        return responseList;
     }
 
     // delete booking (hapus payment nya dulu)

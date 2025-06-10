@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ticketplane.data.dto.BookingResponseDTO;
 import com.ticketplane.data.dto.RequestBooking;
-import com.ticketplane.data.model.ModelBooking;
 import com.ticketplane.data.service.ServiceBooking;
 
 @RestController
@@ -39,14 +38,14 @@ public class ControllerBooking {
 
     // detail tiket
     @GetMapping("/detail/{bookingId}")
-    public ModelBooking detailBooking(@PathVariable Integer bookingId) {
+    public BookingResponseDTO detailBooking(@PathVariable Integer bookingId) {
 
         return srBooking.detailBooking(bookingId);
     }
 
     // history pemesanan tiket
     @GetMapping("/history/user/{userId}")
-    public List<ModelBooking> historyBookingUser(@PathVariable Integer userId) {
+    public List<BookingResponseDTO> historyBookingUser(@PathVariable Integer userId) {
 
         return srBooking.historyBookingUser(userId);
     }
